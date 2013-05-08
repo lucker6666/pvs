@@ -2,6 +2,7 @@
 *.iws
 *.iml
 *.ipr
+.pydevproject
 .classpath
 .project
 .settings
