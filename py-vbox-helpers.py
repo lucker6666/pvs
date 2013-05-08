@@ -8,7 +8,7 @@ from xml.dom import minidom
 from flask import Flask, jsonify
 from HTMLParser import HTMLParser
 from htmlentitydefs import name2codepoint
-
+from flask import make_response
 
 # return a map of all registered VBox VMs
 def getVMList():
@@ -145,6 +145,14 @@ def exampleJsonError():
             indent=4, 
             separators=(',', ': '))
 
+"""another example of a more configurable error msg
+which now is return as a proper json response :)
+"""
+@app.route('/pvb/jsonerr')
+def ivalid_call():
+    resp = make_response(exampleJsonError(), 400)
+    resp.headers['Content'] = 'application/json'
+    return resp
 
 # Parse the HTML of grid console page to extract VMs address, port and browsers data
 @app.route('/pvb/gridConsole')
