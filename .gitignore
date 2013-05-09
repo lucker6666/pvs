@@ -16,4 +16,4 @@
 #gedit
 *.*~
 /flask/*
-
+/target/*
