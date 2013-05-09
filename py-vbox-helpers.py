@@ -159,46 +159,6 @@ def start(listOfBrowsers):
 # Parse the HTML of grid console page to extract VMs address, port and browsers data
 @app.route('/pvb/gridConsole')
 def checkGrid():
-    # This class serves as a basis for parsing files in HTML
-    class MyHTMLParser(HTMLParser):
-
-        def __init__(self):
-            HTMLParser.__init__(self)
-            self.vmsCount = 0
-            # store ip address of VMs that are registered to hub
-            self.vmsAddress = []
-            # store the browsers data which are registered to grid
-            self.browData = []
-
-        # Handles the start tags of the HTML snippet
-        def handle_starttag(self, tag, attrs):
-            # print "Start tag:", tag
-            # for attr in attrs:
-            #     print "     attr:", attr
-
-            # if the tag is "legend", then set the count flag based on which the handle_data method gets the 
-            # tag's data
-            if tag == 'legend':
-                self.vmsCount = 1
-
-            if tag == 'img':
-                for name,value in attrs:
-                    if name == 'title':
-                        self.browData.append(str(value))
-
-
-        def handle_data(self, data):
-            if self.vmsCount:
-                # self.vmsAddress.append(data)
-
-                #append data, which starts with "listening", to the list 
-                if data.startswith('listening'):
-                    # remove the prefix "listening on http://"
-                    stripData = data[20:]
-                    # seperate ip address and port ex, 0.0.0.0:1234 into (0.0.0.0 , 1234 )
-                    tupleData = tuple(stripData.split(':'))
-                    self.vmsAddress.append(str(tupleData))
-
     try:
         # open the url and read the content in HTML form
         url = urllib2.urlopen("http://10.0.2.15:4444/grid/console")
