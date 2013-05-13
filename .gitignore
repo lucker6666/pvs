@@ -6,6 +6,12 @@
 *.swp
 *.zip
 0
+.project
+.pydevproject
+.settings
+
+# virtualenv dir
+pvs
 
 #intellij idea
 .idea
