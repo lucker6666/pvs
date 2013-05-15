@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -9,12 +10,12 @@
     <version>1.0-SNAPSHOT</version>
 
 
-    <!-- <properties>
-        <pvs-address>http://127.0.0.1:5000</pvs-address>
-        <pvs-context>pvs</pvs-context>
-        <pvs-url>${pvs-address}/${pvs-context}</pvs-url>
-    </properties> -->
-
+    <properties>
+        <pvb-address>http://10.92.16.185:5000</pvb-address>
+        <pvb-context>pvb</pvb-context>
+        <pvb-url>${pvb-address}/${pvb-context}</pvb-url>
+        <listOfBrowsers>{"internet%20explorer":"9","firefox":"20"}</listOfBrowsers>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -50,21 +51,106 @@
 <plugin>
     <groupId>net.kennychua</groupId>
     <artifactId>maven-urlpoller-plugin</artifactId>
-    <configuration>
-       <pollUrl>http://10.92.16.185:5000/pvb/gridConsole</pollUrl>
-       <statusCode>200</statusCode>
-       <secondsBetweenPolls>10</secondsBetweenPolls>
-       <repeatFor>5</repeatFor>
-       <failOnFailure>false</failOnFailure>
-    </configuration>
+
      <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>poll</goal>
-                        </goals>
-                    </execution>
-                </executions>
+        <!-- Verifying if the Flask server has been started. This endpoint returns welcome page -->
+        <execution>
+                <id>Flask Welcome</id>
+            <configuration>
+               <pollUrl>${pvb-url}/</pollUrl>
+               <statusCode>200</statusCode>
+               <secondsBetweenPolls>10</secondsBetweenPolls>
+
+               <repeatFor>5</repeatFor>
+               <failOnFailure>false</failOnFailure>
+            </configuration> 
+            <phase>initialize</phase>
+            <goals>
+                <goal>poll</goal>
+            </goals>
+        </execution>
+
+        <execution>
+                <id>Check if VMs have the required Browsers</id>
+            <configuration>
+               <pollUrl>${pvb-url}/verifyBrowsers/${listOfBrowsers}</pollUrl>
+               <statusCode>200</statusCode>
+               <secondsBetweenPolls>10</secondsBetweenPolls>
+
+               <repeatFor>5</repeatFor>
+               <failOnFailure>false</failOnFailure>
+            </configuration> 
+            <phase>initialize</phase>
+            <goals>
+                <goal>poll</goal>
+            </goals>
+        </execution>
+   
+        <execution>
+                <id>Start VMs which have specified Browsers</id>
+            <configuration>
+               <pollUrl>${pvb-url}/startVMs/${listOfBrowsers}</pollUrl>
+               <statusCode>200</statusCode>
+               <secondsBetweenPolls>10</secondsBetweenPolls>
+
+               <repeatFor>5</repeatFor>
+               <failOnFailure>false</failOnFailure>
+            </configuration> 
+            <phase>initialize</phase>
+            <goals>
+                <goal>poll</goal>
+            </goals>
+        </execution>
+
+        <execution>
+                <id>Selenium-Grid Console</id>
+            <configuration>
+               <pollUrl>${pvb-url}/gridConsole</pollUrl>
+               <statusCode>200</statusCode>
+               <secondsBetweenPolls>5</secondsBetweenPolls>
+
+               <repeatFor>50</repeatFor>
+               <failOnFailure>false</failOnFailure>
+            </configuration> 
+            <phase>initialize</phase>
+            <goals>
+                <goal>poll</goal>
+            </goals>
+        </execution>
+
+        <execution>
+                <id>Check if the required browsers are registered in the grid</id>
+            <configuration>
+               <pollUrl>${pvb-url}/gridBrowsersAvailable/${listOfBrowsers}</pollUrl>
+               <statusCode>200</statusCode>
+               <secondsBetweenPolls>5</secondsBetweenPolls>
+
+               <repeatFor>20</repeatFor>
+               <failOnFailure>true</failOnFailure>
+            </configuration> 
+            <phase>initialize</phase>
+            <goals>
+                <goal>poll</goal>
+            </goals>
+        </execution>
+
+        <execution>
+                <id>Shuttin down running VMs</id>
+            <configuration>
+               <pollUrl>${pvb-url}/shutdownVMs</pollUrl>
+               <statusCode>200</statusCode>
+               <secondsBetweenPolls>10</secondsBetweenPolls>
+
+               <repeatFor>5</repeatFor>
+               <failOnFailure>false</failOnFailure>
+            </configuration> 
+            <phase>verify</phase>
+            <goals>
+                <goal>poll</goal>
+            </goals>
+        </execution>
+
+    </executions>
 
   </plugin>
   </plugins>

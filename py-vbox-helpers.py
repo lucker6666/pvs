@@ -12,6 +12,53 @@ from htmlentitydefs import name2codepoint
 from flask import make_response, redirect, url_for
 import socket
 
+#################################
+# HTML Parser
+#################################
+# This class serves as a basis for parsing files in HTML
+class MyHTMLParser(HTMLParser):
+
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.vmsCount = 0
+        # store ip address of VMs that are registered to hub
+        self.vmsAddress = []
+        # store the browsers data which are registered to grid
+        self.browData = []
+
+    # Handles the start tags of the HTML snippet
+    def handle_starttag(self, tag, attrs):
+        # print "Start tag:", tag
+        # for attr in attrs:
+        #     print "     attr:", attr
+
+        # if the tag is "legend", then set the count flag based on which the handle_data method gets the 
+        # tag's data
+        if tag == 'legend':
+            self.vmsCount = 1
+
+        if tag == 'img':
+            for name,value in attrs:
+                if name == 'title':
+                    self.browData.append(str(value))
+
+
+    def handle_data(self, data):
+        if self.vmsCount:
+            # self.vmsAddress.append(data)
+
+            #append data, which starts with "listening", to the list 
+            if data.startswith('listening'):
+                # remove the prefix "listening on http://"
+                stripData = data[20:]
+                # seperate ip address and port ex, 0.0.0.0:1234 into (0.0.0.0 , 1234 )
+                tupleData = tuple(stripData.split(':'))
+                self.vmsAddress.append(str(tupleData))
+
+############################################
+#Helper methods
+############################################
+
 # return a map of all registered VBox VMs
 def getVMList():
     vms = {}
@@ -85,9 +132,11 @@ def getRunningVMsAsList():
     return runningVms
 
 # find the VMs with required browsers version
-def findMatchedVM(browsers):
+def findMatchedVM(browsers,retFlag):
     vmsPresent = getVMsAsList()
     matchedVM = []
+    # defining an empty dictionary, matchedBrowsers
+    matchedBrowsers = {}
     for vm in vmsPresent:
         box = getVMDescriptionAsJSON(vm)['box']
 
@@ -96,14 +145,24 @@ def findMatchedVM(browsers):
                 if brow == i:
                     if box["Browsers"][i]["version"] == browsers[brow]:
                         matchedVM.append(vm)
-    return matchedVM
+                        matchedBrowsers[str(brow)] = str(browsers[brow])
+
+    if retFlag==0:
+        print "Matching VMs : ", matchedVM
+        return matchedVM
+    elif retFlag==1:
+        print "Matching browsers : ", matchedBrowsers
+        return matchedBrowsers
 
 def startVMsWithBrowsers(browsers):
-    VMs = findMatchedVM(browsers)
+    # pass the flag,0 to get matching VMs
+    VMs = findMatchedVM(browsers,0)
     #"set()" Removes duplicates from list 
     VMsmatch = list(set(VMs))
 
     vmsRunning = getRunningVMsAsList()
+    # Get the difference between VMs to start and already running VMs
+    # Start the required VMs which are not already running
     differenceVM = list(set(VMsmatch).difference(set(vmsRunning)))
     print "Starting VM(s) : " , differenceVM
     for vm in differenceVM:
@@ -111,7 +170,79 @@ def startVMsWithBrowsers(browsers):
     print "Running VM(s)" , VMsmatch
     return VMsmatch
 
-#startVMsWithBrowsers({"IE":"9","FF":"20"})
+
+def verifyBrowsersAvailable(browsers):
+    # pass the flag,1 to get the matching browsers
+    browsersMatched = findMatchedVM(browsers,1)
+    return browsersMatched
+    
+
+def startHub():
+    hubVM = "Selenium-hub-LinuxMint"
+    out = subprocess.Popen("VBoxManage startvm "+hubVM, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return "Starting selenium-grid Hub"
+
+
+def verifyGridBrowsers(browsers):
+    # flag=1 to get browsers from htmlParserHelper
+    registeredRequiredBrowsers = {}
+    # get the registerd browsers list from grid console
+    brow = htmlParserHelper(1)
+    for i in range (len(brow)):
+        # remove "type=WebDriver" from each list item
+        data = brow[i].replace("type=WebDriver","")
+        # verify the registered browsers against the required browsers list
+        for key in browsers:
+            # find() method returns -1 if the string not found and the index of string if found
+            if data.find("browserName="+key+", version="+browsers[key]) != -1:
+                registeredRequiredBrowsers[key] = browsers[key]
+                break
+    return registeredRequiredBrowsers
+
+def htmlParserHelper(flag):
+    try:
+        # open the url and read the content in HTML form
+        url = urllib2.urlopen("http://10.92.16.122:4444/grid/console")
+        info = url.read()
+
+        print "INFO : !!! ", info
+
+        parser = MyHTMLParser()
+        # feed the HTML which needs to be parsed
+        parser.feed(info)
+        print "VMs address and ports !! : ", parser.vmsAddress
+        print "BROWWWSERS !! : ", parser.browData
+        zipping = dict(zip(parser.vmsAddress, parser.browData))
+        # prettify json with indent and seperators to print in command line
+        jsonobject = json.dumps(zipping, sort_keys=True, indent=4, separators=(',', ': '))
+
+        # check if there are any nodes registered to the hub
+        if len(zipping) == 0:
+            print "INFO: NO nodes registered"
+            return redirect(url_for('exampleJsonError', code="pvb_E_005", message = "Started hub : No nodes registered to the hub", status=400))
+        else:
+            if flag==0:
+                print "GRID CONSOLE : " , jsonobject
+                # prettify json to print on client webpage
+                return jsonify(zipping)
+            elif flag==1:
+                print "BROWSERS: ", parser.browData
+                return parser.browData
+
+
+    except URLError, e:
+        print "Error :", e.reason
+        # print "Testing if attribute, "code" present for the error object,e : ", hasattr(e, 'code')
+        return redirect(url_for('exampleJsonError', code="pvb_E_004", message = str(e.reason)+" : Selenium hub is not started", status=500))
+        # return str(e.reason)
+
+def shutDownVMs():
+    getRunningVMs = getRunningVMsAsList()
+    print "test : ", getRunningVMs
+    for vm in getRunningVMs:
+        out = subprocess.Popen("VBoxManage controlvm "+vm+" poweroff", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return "Shutting Down VMs : " + json.dumps(getRunningVMs)
+
 
 ################################### 
 # Flask methods 
@@ -134,7 +265,8 @@ def hello():
     if len(vmsList) == 0 :
         return redirect(url_for('exampleJsonError', code="pvb_E_001", message = "No VMs found. Install a few Vms to start testing !!", status=400))
     else:
-        return json.dumps(vmsList)
+        return "List of all the VMs : " + json.dumps(vmsList)
+
 
 @app.route('/pvb/listRunningVMs')
 def hello1():
@@ -143,11 +275,23 @@ def hello1():
         return redirect(url_for('exampleJsonError', code="pvb_E_002", message = "No Running VMs found", status=400))
     else:
         print json.dumps(runVmsList)
-        return json.dumps(runVmsList)
+        return "List of Running VMs : " + json.dumps(runVmsList)
+
+
+@app.route('/pvb/verifyBrowsers/<listOfBrowsers>')
+def findAvailableBrowsers(listOfBrowsers):
+    brow = verifyBrowsersAvailable(json.loads(listOfBrowsers))
+    if len(brow) == 0 :
+        return redirect(url_for('exampleJsonError', code="pvb_E_006", message = "No matching browsers found in the VMs", status=400))
+    else:
+        print "Matched Browsers : ", brow
+        return "List of required browsers available : " + str(brow)
 
 
 @app.route('/pvb/startVMs/<listOfBrowsers>')
 def start(listOfBrowsers):
+    startHub()
+
     # the parameter "listofbrow" is returned as string from the URL. Hence, use json.loads(listofbrow) to 
     # convert to json
     vmsToStart = startVMsWithBrowsers(json.loads(listOfBrowsers))
@@ -159,37 +303,21 @@ def start(listOfBrowsers):
 # Parse the HTML of grid console page to extract VMs address, port and browsers data
 @app.route('/pvb/gridConsole')
 def checkGrid():
-    try:
-        # open the url and read the content in HTML form
-        url = urllib2.urlopen("http://10.0.2.15:4444/grid/console")
-        info = url.read()
-
-        print "INFO : !!! ", info
-
-        parser = MyHTMLParser()
-        # feed the HTML which needs to be parsed
-        parser.feed(info)
-        print "VMs address and ports !! : ", parser.vmsAddress
-        print "BROWWWSERS !! : ", parser.browData
-        zipping = dict(zip(parser.vmsAddress, parser.browData))
-        # prettify json with indent and seperators to print in command line
-        jsonobject = json.dumps(zipping, sort_keys=True, indent=4, separators=(',', ': '))
-
-        # check if there are any nodes registered to the hub
-        if len(zipping) == 0:
-            print "INFO: NO nodes registered"
-            return redirect(url_for('exampleJsonError', code="pvb_E_005", message = "Started hub : No nodes registered to the hub", status=400))
-        else:
-            print "GRID CONSOLE : " , jsonobject
-            # prettify json to print on client webpage
-            return jsonify(zipping)
+    return htmlParserHelper(0)
 
 
-    except URLError, e:
-        print "Error :", e.reason
-        # print "Testing if attribute, "code" present for the error object,e : ", hasattr(e, 'code')
-        return redirect(url_for('exampleJsonError', code="pvb_E_004", message = str(e.reason)+" : Selenium hub is not started", status=500))
-        # return str(e.reason)
+@app.route('/pvb/gridBrowsersAvailable/<listOfBrowsers>')
+def checkGridBrowsers(listOfBrowsers):
+    gridBrow = verifyGridBrowsers(json.loads(listOfBrowsers))
+    if len(gridBrow) == 0 :
+        return redirect(url_for('exampleJsonError', code="pvb_E_007", message = "No required browsers registered in the grid", status=400))
+    else:
+        return "List of required browsers, registered in grid : "+ json.dumps(gridBrow)
+
+
+@app.route('/pvb/shutdownVMs')
+def shutVMs():
+    return shutDownVMs()
 
 ################################### 
 # Error handling 
