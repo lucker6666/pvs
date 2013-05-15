@@ -135,17 +135,24 @@ def getRunningVMsAsList():
 def findMatchedVM(browsers,retFlag):
     vmsPresent = getVMsAsList()
     matchedVM = []
-    # defining an empty dictionary, matchedBrowsers
-    matchedBrowsers = {}
+    print browsers
+    # defining an empty dictionary, tempDict
+    tempDict = {}
+    matchedBrowsers = []
     for vm in vmsPresent:
         box = getVMDescriptionAsJSON(vm)['box']
 
         for brow in browsers:
-            for i in  box["Browsers"]:
-                if brow == i:
-                    if box["Browsers"][i]["version"] == browsers[brow]:
-                        matchedVM.append(vm)
-                        matchedBrowsers[str(brow)] = str(browsers[brow])
+            for b in brow:
+                for i in  box["Browsers"]:
+                    if b == i:
+                        if box["Browsers"][i]["version"] == brow[b]:
+                            matchedVM.append(vm)
+                            tempDict[str(b)] = str(brow[b])
+                            # # x = (str(brow) , str(browsers[brow]))
+                            matchedBrowsers.append(brow)
+                            print matchedBrowsers
+
 
     if retFlag==0:
         print "Matching VMs : ", matchedVM
@@ -185,24 +192,31 @@ def startHub():
 
 def verifyGridBrowsers(browsers):
     # flag=1 to get browsers from htmlParserHelper
-    registeredRequiredBrowsers = {}
+    registeredRequiredBrowsers = []
     # get the registerd browsers list from grid console
     brow = htmlParserHelper(1)
     for i in range (len(brow)):
         # remove "type=WebDriver" from each list item
         data = brow[i].replace("type=WebDriver","")
+        print "DATA : ", data
         # verify the registered browsers against the required browsers list
-        for key in browsers:
-            # find() method returns -1 if the string not found and the index of string if found
-            if data.find("browserName="+key+", version="+browsers[key]) != -1:
-                registeredRequiredBrowsers[key] = browsers[key]
-                break
+        for browse in browsers:
+            print "BROWSE : ", browse
+            print "BROWSER : ", browsers
+            for key in browse:
+                print "KEY : ", key
+                print "VALUE : ", browse[key]
+                # find() method returns -1 if the string not found and the index of string if found
+                if data.find("browserName="+key+", version="+browse[key]) != -1:
+                    registeredRequiredBrowsers.append(browse)
+                    print "Registered : ", registeredRequiredBrowsers
+                    break
     return registeredRequiredBrowsers
 
 def htmlParserHelper(flag):
     try:
         # open the url and read the content in HTML form
-        url = urllib2.urlopen("http://10.92.16.122:4444/grid/console")
+        url = urllib2.urlopen("http://localhost:4444/grid/console")
         info = url.read()
 
         print "INFO : !!! ", info
