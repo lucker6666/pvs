@@ -14,7 +14,7 @@
         <pvb-address>http://10.92.16.185:5000</pvb-address>
         <pvb-context>pvb</pvb-context>
         <pvb-url>${pvb-address}/${pvb-context}</pvb-url>
-        <listOfBrowsers>{"internet%20explorer":"9","firefox":"20"}</listOfBrowsers>
+        <listOfBrowsers>[{"internet%20explorer":"9"},{"firefox":"20"}]</listOfBrowsers>
     </properties>
 
     <dependencies>
@@ -123,9 +123,9 @@
             <configuration>
                <pollUrl>${pvb-url}/gridBrowsersAvailable/${listOfBrowsers}</pollUrl>
                <statusCode>200</statusCode>
-               <secondsBetweenPolls>5</secondsBetweenPolls>
+               <secondsBetweenPolls>15</secondsBetweenPolls>
 
-               <repeatFor>20</repeatFor>
+               <repeatFor>10</repeatFor>
                <failOnFailure>true</failOnFailure>
             </configuration> 
             <phase>initialize</phase>

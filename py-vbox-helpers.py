@@ -194,38 +194,38 @@ def verifyGridBrowsers(browsers):
     # flag=1 to get browsers from htmlParserHelper
     registeredRequiredBrowsers = []
     # get the registerd browsers list from grid console
-    brow = htmlParserHelper(1)
-    for i in range (len(brow)):
-        # remove "type=WebDriver" from each list item
-        data = brow[i].replace("type=WebDriver","")
-        print "DATA : ", data
-        # verify the registered browsers against the required browsers list
-        for browse in browsers:
-            print "BROWSE : ", browse
-            print "BROWSER : ", browsers
-            for key in browse:
-                print "KEY : ", key
-                print "VALUE : ", browse[key]
-                # find() method returns -1 if the string not found and the index of string if found
-                if data.find("browserName="+key+", version="+browse[key]) != -1:
-                    registeredRequiredBrowsers.append(browse)
-                    print "Registered : ", registeredRequiredBrowsers
-                    break
+    availBrows = verifyBrowsersAvailable(browsers)
+
+    while len(availBrows)>0:
+        brow = htmlParserHelper(1)
+        for i in range (len(brow)):
+            # remove "type=WebDriver" from each list item
+            data = brow[i].replace("type=WebDriver","")
+            # verify the registered browsers against the required browsers list
+            for browse in browsers:
+                for key in browse:
+                    # find() method returns -1 if the string not found and the index of string if found
+                    if data.find("browserName="+key+", version="+browse[key]) != -1:
+                        registeredRequiredBrowsers.append(browse)
+
+                        # check if the registered browser is in the available browsers list
+                        for a in availBrows:
+                            for k in a:
+                                if k==key and a[k]==browse[key]:
+                                    availBrows.remove(a)
+                                    break
+                        break
     return registeredRequiredBrowsers
 
 def htmlParserHelper(flag):
     try:
         # open the url and read the content in HTML form
-        url = urllib2.urlopen("http://localhost:4444/grid/console")
+        url = urllib2.urlopen("http://10.92.16.180:4444/grid/console")
         info = url.read()
-
-        print "INFO : !!! ", info
 
         parser = MyHTMLParser()
         # feed the HTML which needs to be parsed
         parser.feed(info)
-        print "VMs address and ports !! : ", parser.vmsAddress
-        print "BROWWWSERS !! : ", parser.browData
         zipping = dict(zip(parser.vmsAddress, parser.browData))
         # prettify json with indent and seperators to print in command line
         jsonobject = json.dumps(zipping, sort_keys=True, indent=4, separators=(',', ': '))
@@ -233,7 +233,7 @@ def htmlParserHelper(flag):
         # check if there are any nodes registered to the hub
         if len(zipping) == 0:
             print "INFO: NO nodes registered"
-            return redirect(url_for('exampleJsonError', code="pvb_E_005", message = "Started hub : No nodes registered to the hub", status=400))
+            return redirect(url_for('exampleJsonError', code="pvb_E_005", message = "Started hub : No nodes registered to the hub"))
         else:
             if flag==0:
                 print "GRID CONSOLE : " , jsonobject
@@ -247,7 +247,7 @@ def htmlParserHelper(flag):
     except URLError, e:
         print "Error :", e.reason
         # print "Testing if attribute, "code" present for the error object,e : ", hasattr(e, 'code')
-        return redirect(url_for('exampleJsonError', code="pvb_E_004", message = str(e.reason)+" : Selenium hub is not started", status=500))
+        return redirect(url_for('exampleJsonError', code="pvb_E_004", message = str(e.reason)+" : Selenium hub is not started"))
         # return str(e.reason)
 
 def shutDownVMs():
@@ -277,7 +277,7 @@ def index():
 def hello():
     vmsList = getVMsAsList()
     if len(vmsList) == 0 :
-        return redirect(url_for('exampleJsonError', code="pvb_E_001", message = "No VMs found. Install a few Vms to start testing !!", status=400))
+        return redirect(url_for('exampleJsonError', code="pvb_E_001", message = "No VMs found. Install a few Vms to start testing !!"))
     else:
         return "List of all the VMs : " + json.dumps(vmsList)
 
@@ -286,7 +286,7 @@ def hello():
 def hello1():
     runVmsList = getRunningVMsAsList()
     if len(runVmsList) == 0 :
-        return redirect(url_for('exampleJsonError', code="pvb_E_002", message = "No Running VMs found", status=400))
+        return redirect(url_for('exampleJsonError', code="pvb_E_002", message = "No Running VMs found"))
     else:
         print json.dumps(runVmsList)
         return "List of Running VMs : " + json.dumps(runVmsList)
@@ -296,10 +296,10 @@ def hello1():
 def findAvailableBrowsers(listOfBrowsers):
     brow = verifyBrowsersAvailable(json.loads(listOfBrowsers))
     if len(brow) == 0 :
-        return redirect(url_for('exampleJsonError', code="pvb_E_006", message = "No matching browsers found in the VMs", status=400))
+        return redirect(url_for('exampleJsonError', code="pvb_E_006", message = "No matching browsers found in the VMs"))
     else:
         print "Matched Browsers : ", brow
-        return "List of required browsers available : " + str(brow)
+        return "List of required browsers available : " + json.dumps(brow)
 
 
 @app.route('/pvb/startVMs/<listOfBrowsers>')
@@ -310,7 +310,7 @@ def start(listOfBrowsers):
     # convert to json
     vmsToStart = startVMsWithBrowsers(json.loads(listOfBrowsers))
     if len(vmsToStart) == 0:
-        return redirect(url_for('exampleJsonError', code="pvb_E_003", message = "The required browsers cannot be found in any of the VMs. Check the available browsers", status=400))
+        return redirect(url_for('exampleJsonError', code="pvb_E_003", message = "The required browsers cannot be found in any of the VMs. Check the available browsers"))
     else:
         return "Starting VM(s) : " + json.dumps(vmsToStart)
 
@@ -324,7 +324,7 @@ def checkGrid():
 def checkGridBrowsers(listOfBrowsers):
     gridBrow = verifyGridBrowsers(json.loads(listOfBrowsers))
     if len(gridBrow) == 0 :
-        return redirect(url_for('exampleJsonError', code="pvb_E_007", message = "No required browsers registered in the grid", status=400))
+        return redirect(url_for('exampleJsonError', code="pvb_E_007", message = "No required browsers registered in the grid"))
     else:
         return "List of required browsers, registered in grid : "+ json.dumps(gridBrow)
 
@@ -337,12 +337,13 @@ def shutVMs():
 # Error handling 
 ###################################
 
-@app.route('/pvb/err/<code>/<message>/<status>')
-def exampleJsonError(code,message,status):
-    error = {'error': {'errorCode':code, 'msg':message, 'statusCode':status}}
+@app.route('/pvb/err/<code>/<message>')
+def exampleJsonError(code,message):
+    error = {'error': {'errorCode':code, 'msg':message}}
+    # error = {'error': {'errorCode':code, 'msg':message, 'statusCode':status}}
     errorMessage = jsonify(error)
     errorMessage.headers['Content'] = 'application/json'
-    errorMessage.status_code=int(status)
+    # errorMessage.status_code=int(status)
 
     print json.dumps(error,sort_keys=True, indent=4, separators=(',', ': '))
     return errorMessage
