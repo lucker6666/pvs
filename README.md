@@ -21,7 +21,7 @@ pip install Flask
 #VBoxManage
 VBoxManage is the command-line interface to control and manage the virtualbox from the host machine
 http://www.virtualbox.org/manual/ch08.html
-maven url poller plugin
+
 #Flask
 Flask is a micro-framework for python which has a built-in development server. Flask is used in the tool to start a simple http server and also to bind the funcitons to URLs.
 http://flask.pocoo.org/docs/

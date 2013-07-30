@@ -209,12 +209,34 @@ def verifyGridBrowsers(browsers):
                 if data.find("browserName="+key+", version="+browse[key]) != -1:
                     registeredRequiredBrowsers.append(browse)
                     break
+
+    availBrows = verifyBrowsersAvailable(browsers)
+
+    while len(availBrows)>0:
+        brow = htmlParserHelper(1)
+        for i in range (len(brow)):
+            # remove "type=WebDriver" from each list item
+            data = brow[i].replace("type=WebDriver","")
+            # verify the registered browsers against the required browsers list
+            for browse in browsers:
+                for key in browse:
+                    # find() method returns -1 if the string not found and the index of string if found
+                    if data.find("browserName="+key+", version="+browse[key]) != -1:
+                        registeredRequiredBrowsers.append(browse)
+
+                        # check if the registered browser is in the available browsers list
+                        for a in availBrows:
+                            for k in a:
+                                if k==key and a[k]==browse[key]:
+                                    availBrows.remove(a)
+                                    break
+                        break
     return registeredRequiredBrowsers
 
 def htmlParserHelper(flag):
     try:
         # open the url and read the content in HTML form
-        url = urllib2.urlopen("http://localhost:4444/grid/console")
+        url = urllib2.urlopen("http://10.92.16.180:4444/grid/console")
         info = url.read()
 
         parser = MyHTMLParser()
