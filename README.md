@@ -87,13 +87,70 @@ PVS will use these details to match requested browser(s).
 ```
 
 ### Configuring Maven
+Configure Maven to execute Flask URLs. Use maven-url-poller-plugin dependency to poll the URLs until the required response is obtained.
 
+maven-url-poller-plugin dependency:
+```xml
+<dependencies>
+        <dependency>
+            <groupId>net.kennychua</groupId>
+            <artifactId>maven-urlpoller-plugin</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+    </dependencies>
+```
+
+Executing flask URL using poller plugin:
+```xml
+<plugin>
+    <groupId>net.kennychua</groupId>
+    <artifactId>maven-urlpoller-plugin</artifactId>
+
+     <executions>
+        <!-- Verifying if the Flask server has been started. This endpoint returns welcome page -->
+        <execution>
+                <id>Flask Welcome</id>
+            <configuration>
+               <pollUrl>${pvb-url}/</pollUrl>
+               <statusCode>200</statusCode>
+               <secondsBetweenPolls>10</secondsBetweenPolls>
+               <repeatFor>5</repeatFor>
+               <failOnFailure>false</failOnFailure>
+            </configuration> 
+            <phase>initialize</phase>
+            <goals>
+                <goal>poll</goal>
+            </goals>
+        </execution>
+        '
+        '
+    </executions>
+</plugin>
+```
 
 ### Starting Flask Server
+To start the flask server, run the Python script in a Python interpreter:
+```python
+python py-vbox-helpers.py 
+```
+which should start the server and return the host address and port it is running on:
+```
+* Running on http://0.0.0.0:5000/
+* Restarting with reloader
+```
+When the URL : http://0.0.0.0:5000/pvb/ is opened in a browser, Python virtual box welcome screen should be found.
 
+Steps included in py-vbox-helpers.py to start the Flask server:
+1. Imported flask class
+2. route() to tell flask to run particular python functions for respective URLs
+3. run() function to start the Flask server
 
 ### Running Maven project
-
+The project can be run from maven using
+```
+mvn install
+```
+The Flask endpoints, as configured in pom.xml, are executed in order and wait for the expected status code. The project can be run manually by executing the Flask endpoints manually in a browser.
 
 This project contains more of parsing data hence, the code might be a bit confusing and has many loops. 
 
