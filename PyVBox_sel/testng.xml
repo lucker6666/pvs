@@ -1,0 +1,32 @@
+<suite name="Same TestCases on Different Browser" verbose="3"  parallel="tests" thread-count="3">
+
+<!--  <test name="Run on Chrome">
+        <parameter name="browser"  value="chrome"/>
+        <classes>
+            <class name="pageElements.Test"/>
+        </classes>
+    </test>-->
+
+ <test name="Run on Firefox">
+        <parameter name="browser" value="firefox"/>
+        <!--<parameter name="version" value="23"/>-->
+        <classes>
+            <class name="pageElements.Test"/>
+        </classes>
+    </test>
+
+<!--    <test name="Run on Firefox 2">
+        <parameter name="browser" value="firefox"/>
+        &lt;!&ndash;<parameter name="version" value="23"/>&ndash;&gt;
+        <classes>
+            <class name="pageElements.Test"/>
+        </classes>
+    </test>-->
+
+<test name="Run on IE">
+        <parameter name="browser"  value="iexplorer"/>
+        <classes>
+            <class name="pageElements.Test"/>
+        </classes>
+    </test>
+</suite>

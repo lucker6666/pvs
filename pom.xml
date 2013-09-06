@@ -11,7 +11,7 @@
 
 
     <properties>
-        <pvb-address>http://10.92.16.185:5000</pvb-address>
+        <pvb-address>http://10.92.16.121:5000</pvb-address>
         <pvb-context>pvb</pvb-context>
         <pvb-url>${pvb-address}/${pvb-context}</pvb-url>
         <listOfBrowsers>[{"internet%20explorer":"9"},{"firefox":"20"}]</listOfBrowsers>

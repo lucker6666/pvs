@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="2" passed="2">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Same TestCases on Different Browser" duration-ms="11944" started-at="2013-09-03T14:36:13Z" finished-at="2013-09-03T14:36:25Z">
+    <groups>
+    </groups>
+    <test name="Run on Firefox" duration-ms="4845" started-at="2013-09-03T14:36:13Z" finished-at="2013-09-03T14:36:18Z">
+      <class name="pageElements.Test">
+        <test-method status="PASS" signature="setUp(java.lang.String)[pri:0, instance:pageElements.Test@487a1576]" name="setUp" is-config="true" duration-ms="3379" started-at="2013-09-03T15:36:13Z" finished-at="2013-09-03T15:36:17Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[firefox]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method status="PASS" signature="test_fourth()[pri:0, instance:pageElements.Test@487a1576]" name="test_fourth" duration-ms="1366" started-at="2013-09-03T15:36:17Z" finished-at="2013-09-03T15:36:18Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- test_fourth -->
+        <test-method status="PASS" signature="tearDown()[pri:0, instance:pageElements.Test@487a1576]" name="tearDown" is-config="true" duration-ms="89" started-at="2013-09-03T15:36:18Z" finished-at="2013-09-03T15:36:18Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- pageElements.Test -->
+    </test> <!-- Run on Firefox -->
+    <test name="Run on IE" duration-ms="11944" started-at="2013-09-03T14:36:13Z" finished-at="2013-09-03T14:36:25Z">
+      <class name="pageElements.Test">
+        <test-method status="PASS" signature="setUp(java.lang.String)[pri:0, instance:pageElements.Test@31b5998f]" name="setUp" is-config="true" duration-ms="7513" started-at="2013-09-03T15:36:13Z" finished-at="2013-09-03T15:36:21Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[iexplorer]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method status="PASS" signature="test_fourth()[pri:0, instance:pageElements.Test@31b5998f]" name="test_fourth" duration-ms="2638" started-at="2013-09-03T15:36:21Z" finished-at="2013-09-03T15:36:23Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- test_fourth -->
+        <test-method status="PASS" signature="tearDown()[pri:0, instance:pageElements.Test@31b5998f]" name="tearDown" is-config="true" duration-ms="1785" started-at="2013-09-03T15:36:23Z" finished-at="2013-09-03T15:36:25Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- pageElements.Test -->
+    </test> <!-- Run on IE -->
+  </suite> <!-- Same TestCases on Different Browser -->
+</testng-results>

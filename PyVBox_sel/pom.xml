@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>sel</groupId>
+    <artifactId>sel</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+    <!--<properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <yell.automation.version>3.0.11</yell.automation.version>
+        <pvb-address>http://10.92.16.121:5000</pvb-address>
+        <pvb-context>pvb</pvb-context>
+        <pvb-url>${pvb-address}/${pvb-context}</pvb-url>
+        &lt;!&ndash;<listOfBrowsers>[{"firefox":"16"},{"internet%20explorer":"9"}]</listOfBrowsers>&ndash;&gt;
+        <listOfBrowsers>[{"firefox":"16"},{"firefox":"20"}]</listOfBrowsers>
+    </properties>-->
+
+
+    <repositories>
+        <repository>
+            <id>Selenium Repo</id>
+            <url>http://repo1.maven.org/maven2</url>
+            <name>Selenium Repo</name>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>Selenium Repo</id>
+            <url>http://repo1.maven.org/maven2</url>
+            <name>Selenium Repo</name>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+       <!-- <dependency>
+            <groupId>com.yell.automation</groupId>
+            <artifactId>common</artifactId>
+            <version>${yell.automation.version}</version>
+        </dependency>-->
+        <dependency>
+        <groupId>net.kennychua</groupId>
+        <artifactId>maven-urlpoller-plugin</artifactId>
+        <version>1.0.3</version>
+    </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.8-beta3</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-server</artifactId>
+            <!--<scope>system</scope>-->
+            <version>2.31.0</version>
+
+            <!-- OLD WAY -->
+            <!--
+               <groupId>org.openqa.selenium</groupId>
+               <artifactId>server.standalone</artifactId>
+               <scope>system</scope>
+               <version>2.24.1</version>
+               <type>jar</type>
+               <systemPath>${project.basedir}/src/main/resources/lib/selenium-server-standalone-2.24.1.jar</systemPath>
+                -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.7</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <!-- Exclusions only required for version 1.2.15 of log4j -->
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.jms</groupId>
+                    <artifactId>jms</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jdmk</groupId>
+                    <artifactId>jmxtools</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jmx</groupId>
+                    <artifactId>jmxri</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
+            <version>3.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+	<dependency>
+            <groupId>org.jbehave.web</groupId>
+            <artifactId>jbehave-web-selenium</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+	<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>3.1.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-spring</artifactId>
+            <version>3.7.5</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+        </resource>
+        </resources>
+        <filters>
+            <filter>src/main/resources/filter-properties.properties</filter>
+        </filters>
+        <plugins>
+
+            <!--<plugin>-->
+                <!--<groupId>org.jbehave</groupId>-->
+                <!--<artifactId>jbehave-maven-plugin</artifactId>-->
+                <!--<version>3.7.5</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>run-stories-as-embeddables</id>-->
+                        <!--<phase>integration-test</phase>-->
+                        <!--<configuration>-->
+                            <!--<includes>-->
+                                <!--<include>**/*Scenarios.java</include>-->
+                            <!--</includes>-->
+                            <!--<ignoreFailureInStories>true</ignoreFailureInStories>-->
+                            <!--<ignoreFailureInView>false</ignoreFailureInView>-->
+                        <!--</configuration>-->
+                        <!--<goals>-->
+                            <!--<goal>run-stories-as-embeddables</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.14</version>
+                <configuration>
+                    <suiteXmlFiles>
+                    <suiteXmlFile>${basedir}/testng.xml</suiteXmlFile>
+                   </suiteXmlFiles>
+                    <!--<includes>-->
+                        <!--<include>Sample.java</include>-->
+                    <!--</includes>-->
+
+		<systemPropertyVariables>
+             <webdriver.chrome.driver>/usr/local/bin/chromedriver</webdriver.chrome.driver>
+        </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+	<plugin>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>2.3.2</version>
+		<configuration>
+			<source>1.6</source>
+			<target>1.6</target>
+		</configuration>
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-dependency-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>unpack-jbehave-site-resources</id>-->
+                        <!--<phase>generate-resources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>unpack</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<artifactItems>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.jbehave.site</groupId>-->
+                                    <!--<artifactId>jbehave-site-resources</artifactId>-->
+                                    <!--<version>3.7.5</version>-->
+                                    <!--<type>zip</type>-->
+                                    <!--<outputDirectory> ${project.build.directory}/jbehave/view</outputDirectory>-->
+                                <!--</artifactItem>-->
+                            <!--</artifactItems>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                    <!--<execution>-->
+                        <!--<id>unpack-jbehave-reports-resources</id>-->
+                        <!--<phase>generate-resources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>unpack</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<artifactItems>-->
+                                <!--<artifactItem>-->
+                                    <!--<groupId>org.jbehave</groupId>-->
+                                    <!--<artifactId>jbehave-core</artifactId>-->
+                                    <!--<version>3.7.5</version>-->
+                                    <!--<outputDirectory>${project.build.directory}/jbehave/view</outputDirectory>-->
+                                    <!--<includes>**\/*.css,**\/*.ftl,**\/*.js</includes>-->
+                                <!--</artifactItem>-->
+                            <!--</artifactItems>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+
+            <!-- <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <echo>Displaying value of 'pvs-address' property</echo>
+                                <echo>using PVS service @ ${pvs-address}</echo>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin> -->
+
+
+        <!--Maven plugin to read the properties file-->
+              </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${basedir}/src/main/resources/filter-properties.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>net.kennychua</groupId>
+                <artifactId>maven-urlpoller-plugin</artifactId>
+
+                <executions>
+                    <!-- Verifying if the Flask server has been started. This endpoint returns welcome page -->
+
+                    <execution>
+                        <id>Flask Welcome</id>
+                        <configuration>
+                            <pollUrl>${pvb-url}/</pollUrl>
+                            <statusCode>200</statusCode>
+                            <secondsBetweenPolls>10</secondsBetweenPolls>
+
+                            <repeatFor>5</repeatFor>
+                            <failOnFailure>false</failOnFailure>
+                        </configuration>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>poll</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>Check if VMs have the required Browsers</id>
+                        <configuration>
+                            <pollUrl>${pvb-url}/verifyBrowsers/${listOfBrowsers}</pollUrl>
+                            <statusCode>200</statusCode>
+                            <secondsBetweenPolls>10</secondsBetweenPolls>
+
+                            <repeatFor>5</repeatFor>
+                            <failOnFailure>false</failOnFailure>
+                        </configuration>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>poll</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>Start VMs which have specified Browsers</id>
+                        <configuration>
+                            <pollUrl>${pvb-url}/startVMs/${listOfBrowsers}</pollUrl>
+                            <statusCode>200</statusCode>
+                            <secondsBetweenPolls>10</secondsBetweenPolls>
+
+                            <repeatFor>5</repeatFor>
+                            <failOnFailure>false</failOnFailure>
+                        </configuration>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>poll</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>Selenium-Grid Console</id>
+                        <configuration>
+                            <pollUrl>${pvb-url}/gridConsole</pollUrl>
+                            <statusCode>200</statusCode>
+                            <secondsBetweenPolls>5</secondsBetweenPolls>
+
+                            <repeatFor>50</repeatFor>
+                            <failOnFailure>false</failOnFailure>
+                        </configuration>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>poll</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>Check if the required browsers are registered in the grid</id>
+                        <configuration>
+                            <pollUrl>${pvb-url}/gridBrowsersAvailable/${listOfBrowsers}</pollUrl>
+                            <statusCode>200</statusCode>
+                            <secondsBetweenPolls>15</secondsBetweenPolls>
+
+                            <repeatFor>10</repeatFor>
+                            <failOnFailure>true</failOnFailure>
+                        </configuration>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>poll</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>Shuttin down running VMs</id>
+                        <configuration>
+                            <pollUrl>${pvb-url}/shutdownVMs</pollUrl>
+                            <statusCode>200</statusCode>
+                            <secondsBetweenPolls>10</secondsBetweenPolls>
+
+                            <repeatFor>5</repeatFor>
+                            <failOnFailure>false</failOnFailure>
+                        </configuration>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>poll</goal>
+                        </goals>
+                    </execution>
+
+                </executions>
+
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
